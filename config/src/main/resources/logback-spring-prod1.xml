@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!--引入SpringBoot日志配置-->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!--JMX配置器允许通过JXM配置logback-->
+    <!--如果服务器运行在JDK1.6或更高版本，可以直接运行jconsole程序，然后连接到你的服务器的MBeanServer-->
+    <jmxConfigurator/>
+
+    <property name="logDir" value="/home/emon/saas/SpringCloud-Sell/config/logs/config1"/>
+
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="monitor_exception" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logDir}/%d{yyyyMMdd}/monitor_exception.%i.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>20MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="desc_normal" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logDir}/%d{yyyyMMdd}/desc_normal.%i.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>20MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!--
+    使用说明：
+    针对以下logger，可以在
+    logback-spring-dev.xml
+    logback-spring-prod.xml
+    logback-spring-test.xml
+    中声名同等配置的logger，修改level，可以覆盖本文件配置。
+    具体生效文件，根据spring.profiles.active的配置而定。
+    -->
+
+    <logger name="com.coding" level="INFO" additivity="true">
+        <appender-ref ref="monitor_exception"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="desc_normal"/>
+    </root>
+
+</configuration>
