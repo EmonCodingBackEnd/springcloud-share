@@ -14,7 +14,7 @@ spring:
     config:
       server:
         git:
-          uri: https://github.com/SpringCloud-Sell/config-repo.git
+          uri: https://github.com/EmonCodingBackEnd/springcloud-config-repo.git
           username: Rushing0711
           password: Mt209@3
           basedir: /home/emon/saas/SpringCloud-Sell/config/basedir
