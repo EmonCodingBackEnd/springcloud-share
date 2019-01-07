@@ -1,0 +1,29 @@
+# 切换生产环境地址使用
+prod:
+  host: 39.107.97.197
+server:
+  port: 8781
+
+# 访问config需要的配置
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${prod.host}:8761/eureka/
+
+spring:
+  application:
+    name: api-gateway
+#  profiles:
+#    active: dev
+#  rabbitmq:
+#    host: ${prod.host}
+#    port: 5672
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: config
+      profile: dev
+      label: master
+      username: user
+      password: 123456
