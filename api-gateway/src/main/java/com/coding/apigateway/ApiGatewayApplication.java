@@ -18,7 +18,7 @@ public class ApiGatewayApplication {
         SpringApplication.run(ApiGatewayApplication.class, args);
     }
 
-    /*@Bean
+    /*
     @RefreshScope
     @ConfigurationProperties("zuul")
     public ZuulProperties zuulProperties() {

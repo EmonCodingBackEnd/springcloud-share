@@ -2,7 +2,7 @@
 prod:
   host: 39.107.97.197
 server:
-  port: 8781
+  port: 8759
 
 # 访问config需要的配置
 eureka:
@@ -12,7 +12,7 @@ eureka:
 
 spring:
   application:
-    name: api-gateway
+    name: user
   profiles:
     active: dev
   cloud:
@@ -24,4 +24,3 @@ spring:
       label: master
       username: user
       password: 123456
-
