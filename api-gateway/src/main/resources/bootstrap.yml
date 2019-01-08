@@ -13,8 +13,8 @@ eureka:
 spring:
   application:
     name: api-gateway
-#  profiles:
-#    active: dev
+  profiles:
+    active: dev
 #  rabbitmq:
 #    host: ${prod.host}
 #    port: 5672
@@ -27,3 +27,4 @@ spring:
       label: master
       username: user
       password: 123456
+
