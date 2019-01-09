@@ -12,6 +12,8 @@
  ********************************************************************************/
 package com.ishanshan.apigateway.filter;
 
+import com.ishanshan.apigateway.exception.GatewayException;
+import com.ishanshan.apigateway.exception.GatewayStatus;
 import com.ishanshan.apigateway.filter.jwt.JwtAuthConstants;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
@@ -60,6 +62,8 @@ public class PostFilter extends ZuulFilter {
         HttpServletResponse response = requestContext.getResponse();
         if (JwtAuthConstants.isAuthLogin(request)) {
             // TODO: 2019/1/9 获取Session放入缓存中
+        } else {
+            throw new GatewayException(GatewayStatus.GATEWAY_BAD_REQUEST);
         }
         response.setHeader("X-Foo", UUID.randomUUID().toString());
         return null;

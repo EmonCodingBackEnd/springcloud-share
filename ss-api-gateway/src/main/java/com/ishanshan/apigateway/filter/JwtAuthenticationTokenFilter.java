@@ -21,14 +21,13 @@ import com.ishanshan.apigateway.filter.auth.LoginSession;
 import com.ishanshan.apigateway.filter.jwt.JwtTokenUtil;
 import com.ishanshan.apigateway.regex.RegexSupport;
 import com.ishanshan.apigateway.regex.result.GatewayUrlRegexResult;
+import com.ishanshan.apigateway.util.UrlUtils;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.util.UrlUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -84,10 +83,12 @@ public class JwtAuthenticationTokenFilter extends ZuulFilter {
 
         String authToken = jwtTokenUtil.fetchToken(request);
         if (StringUtils.isEmpty(authToken)) {
+            requestContext.setSendZuulResponse(false);
+            requestContext.setResponseStatusCode(121);
             throw new GatewayException(GatewayStatus.GATEWAY_TOKEN_NOT_FOUND);
         }
 
-        String username = jwtTokenUtil.getUsernameFromToken(authToken);
+        /*String username = jwtTokenUtil.getUsernameFromToken(authToken);
         if (StringUtils.isEmpty(username)) {
             throw new GatewayException(GatewayStatus.GATEWAY_TOKEN_EXPIRED_OR_INVALID);
         }
@@ -101,26 +102,19 @@ public class JwtAuthenticationTokenFilter extends ZuulFilter {
             throw new GatewayException(GatewayStatus.GATEWAY_TOKEN_EXPIRED);
         }
 
-        LoginSession loginSession = loadUserByUsername(eurekaServerName, username);
+        LoginSession loginSession = redisCache.userSession(eurekaServerName, username);
         CustomUserDetails customUserDetails =
                 new CustomUserDetails(
-                        loginSession.getTenantId(),
-                        loginSession.getCurrentShopId(),
                         loginSession.getUserId(),
-                        null,
-                        null);
+                        loginSession.getTenantId(),
+                        loginSession.getCurrentShopId());
         if (jwtTokenUtil.validateToken(authToken, customUserDetails)) {
             throw new GatewayException(GatewayStatus.GATEWAY_TOKEN_INVALID);
         }
 
         String userCacheJson = loginSession.getPostJson();
         // TODO: 2019/1/9 如何存入Request
-        log.info("authenticated user " + username + ", setting security context");
+        log.info("authenticated user " + username + ", setting security context");*/
         return null;
-    }
-
-    public LoginSession loadUserByUsername(String eurekaServerName, String username)
-            throws UsernameNotFoundException {
-        return redisCache.userSession(eurekaServerName, username);
     }
 }

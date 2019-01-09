@@ -1,6 +1,6 @@
 package com.ishanshan.apigateway.filter.jwt;
 
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import com.ishanshan.apigateway.util.AntPathRequestMatcher;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.Charset;

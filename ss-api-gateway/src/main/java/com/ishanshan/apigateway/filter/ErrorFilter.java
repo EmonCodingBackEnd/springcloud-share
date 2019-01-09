@@ -12,10 +12,12 @@
  ********************************************************************************/
 package com.ishanshan.apigateway.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
 import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException;
 import org.springframework.stereotype.Component;
@@ -28,6 +30,8 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 @Slf4j
 public class ErrorFilter extends ZuulFilter {
+    @Autowired private ObjectMapper objectMapper;
+
     @Override
     public String filterType() {
         return FilterConstants.ERROR_TYPE;

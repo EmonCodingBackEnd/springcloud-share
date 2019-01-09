@@ -12,15 +12,15 @@
  ********************************************************************************/
 package com.ishanshan.apigateway.filter.auth;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-
-import java.util.Collection;
+import lombok.Data;
 import java.util.Date;
 
-public class CustomUserDetails extends User {
+@Data
+public class CustomUserDetails {
 
     private static final long serialVersionUID = 4511886230708246366L;
+
+    private String username;
 
     /** 用户所属租户. */
     private String tenantId;
@@ -30,38 +30,9 @@ public class CustomUserDetails extends User {
 
     private Date lastPasswordResetDate;
 
-    public CustomUserDetails(
-            String tenantId,
-            String currentShopId,
-            String username,
-            String password,
-            Collection<? extends GrantedAuthority> authorities) {
-        super(username, password, authorities);
+    public CustomUserDetails(String username, String tenantId, String currentShopId) {
+        this.username = username;
         this.tenantId = tenantId;
         this.currentShopId = currentShopId;
-    }
-
-    public String getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(String tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    public String getCurrentShopId() {
-        return currentShopId;
-    }
-
-    public void setCurrentShopId(String currentShopId) {
-        this.currentShopId = currentShopId;
-    }
-
-    public Date getLastPasswordResetDate() {
-        return lastPasswordResetDate;
-    }
-
-    public void setLastPasswordResetDate(Date lastPasswordResetDate) {
-        this.lastPasswordResetDate = lastPasswordResetDate;
     }
 }

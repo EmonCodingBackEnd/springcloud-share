@@ -13,13 +13,12 @@
 package com.ishanshan.apigateway.filter.jwt;
 
 import com.ishanshan.apigateway.filter.auth.CustomUserDetails;
+import com.ishanshan.apigateway.util.AntPathRequestMatcher;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import sun.misc.BASE64Decoder;
@@ -144,7 +143,7 @@ public class JwtTokenUtil implements Serializable {
         return (lastPasswordReset != null && created.before(lastPasswordReset));
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(CustomUserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
         claims.put(CLAIM_KEY_CREATED, new Date());
@@ -177,13 +176,13 @@ public class JwtTokenUtil implements Serializable {
         return refreshedToken;
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        CustomUserDetails user = (CustomUserDetails) userDetails;
+    public Boolean validateToken(String token, CustomUserDetails userDetails) {
         final String username = getUsernameFromToken(token);
         final Date created = getCreatedDateFromToken(token);
-        return (username.equals(user.getUsername())
+        return (username.equals(userDetails.getUsername())
                 && !isTokenExpired(token)
-                && !isCreatedBeforeLastPasswordReset(created, user.getLastPasswordResetDate()));
+                && !isCreatedBeforeLastPasswordReset(
+                        created, userDetails.getLastPasswordResetDate()));
     }
     /**
      * 根据HttpServletRequest获取token.
