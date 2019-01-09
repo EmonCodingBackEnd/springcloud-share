@@ -1,0 +1,31 @@
+env: none
+
+zuul:
+  routes:
+#    myProduct:
+#      path: /myProduct/**
+#      serviceId: product
+    product: /myProduct/**
+#  ignored-patterns:
+  host:
+    connect-timeout-millis: 10000
+
+spring:
+  cache:
+    type: redis
+    cache-names: redisCache
+  redis:
+    database: 0
+    host: ${prod.host}
+    port: 6379
+    timeout: 0
+    password: redis@163
+
+#全局的ribbon设置
+# feign.RetryableException: Read timed out executing POST
+ribbon:
+  ReadTimeout: 20000
+  ConnectTimeout: 20000
+
+logging:
+  config: classpath:logback-spring-${spring.profiles.active}.xml
