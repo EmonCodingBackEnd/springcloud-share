@@ -16,7 +16,7 @@ public class GatewayUrlRegexResult extends RegexResult {
 
     private String apiVersion;
 
-    private String others;
+    private String effectiveUrl;
 
     /** api = serverName/serverName/apiVersion/others. */
     private String api;

@@ -12,6 +12,7 @@
  ********************************************************************************/
 package com.ishanshan.gateway.exception;
 
+import com.ishanshan.gateway.api.GatewayResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -23,6 +24,7 @@ public class GatewayException extends RuntimeException {
 
     private Integer code;
 
+
     public GatewayException(GatewayStatus statusEnum) {
         super(statusEnum.getMessage());
         this.code = statusEnum.getCode();
@@ -31,5 +33,9 @@ public class GatewayException extends RuntimeException {
     public GatewayException(Integer code, String message) {
         super(message);
         this.code = code;
+    }
+
+    public GatewayException(GatewayResponse gatewayResponse) {
+        this(gatewayResponse.getErrorCode(), gatewayResponse.getErrorMessage());
     }
 }

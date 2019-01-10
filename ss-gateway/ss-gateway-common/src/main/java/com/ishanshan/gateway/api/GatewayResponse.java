@@ -16,12 +16,11 @@ import com.ishansha.api.AppResponse;
 
 import java.io.Serializable;
 
-public class GatewayResponse<T extends Serializable> extends AppResponse {
+public class GatewayResponse<T extends Serializable> extends AppResponse<T> {
 
     private static final long serialVersionUID = 5005298608206740834L;
 
-    /** 错误码. */
-    protected Integer errorCode = 0;
-
-    protected T data;
+    public GatewayResponse() {
+        this.errorCode = 0;
+    }
 }

@@ -16,11 +16,24 @@ import com.ishanshan.gateway.api.GatewayResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
+
+/**
+ * 获取用户授权信息的应答.
+ *
+ * <p>创建时间: <font style="color:#00FFFF">20190110 23:16</font><br>
+ * [请在此输入功能详述]
+ *
+ * @author Rushing0711
+ * @version 1.0.0
+ * @since 1.0.0
+ */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class AuthResponse extends GatewayResponse {
+public class AuthResponse<T extends Serializable> extends GatewayResponse<T> {
 
     private static final long serialVersionUID = -1616421716930756640L;
 
+    /** 根据用户的token，换取的用户详情. */
     private AuthDetail authDetail;
 }

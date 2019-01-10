@@ -21,13 +21,11 @@ public enum GatewayRedisKeyType {
     USERINFO_TOKEN("user", "token", "用户登录标识缓存"),
     USERINFO_TOKENWHITELIST("user", "tokenWhitelist", "用户authToken白名单列表"),
     USERINFO_SESSION("user", "cache", "用户登录缓存信息"),
-    SYSTEM_INFO("system", "cache", "系统缓存信息"),
     ;
 
-    private String delimiter = ":";
-    private String EMPTY = "";
-
     GatewayRedisKeyType(String serverName, String purpose, String description) {
+        String EMPTY = "";
+        keys.add(EMPTY);
         keys.add(StringUtils.trimWhitespace(serverName));
         keys.add(StringUtils.trimWhitespace(purpose));
         keys.add(EMPTY);
@@ -38,6 +36,7 @@ public enum GatewayRedisKeyType {
     private String description;
 
     public String getKey() {
+        String delimiter = ":";
         return StringUtils.collectionToDelimitedString(keys, delimiter);
     }
 

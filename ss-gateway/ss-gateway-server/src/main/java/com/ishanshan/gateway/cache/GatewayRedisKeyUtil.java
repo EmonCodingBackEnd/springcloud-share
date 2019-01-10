@@ -21,11 +21,15 @@ public class GatewayRedisKeyUtil {
 
     /** 用户authToken白名单列表 */
     public static String getUserinfoTokenWhitelistRedisKey(String eurekaServerName, String userId) {
-        return GatewayRedisKeyType.USERINFO_TOKENWHITELIST.getKey().concat(userId);
+        return eurekaServerName
+                .concat(GatewayRedisKeyType.USERINFO_TOKENWHITELIST.getKey())
+                .concat(userId);
     }
 
     /** 用户登录缓存信息. */
     public static String getUserinfoCacheRedisKey(String eurekaServerName, String userId) {
-        return GatewayRedisKeyType.USERINFO_SESSION.getKey().concat(userId);
+        return eurekaServerName
+                .concat(GatewayRedisKeyType.USERINFO_SESSION.getKey())
+                .concat(userId);
     }
 }

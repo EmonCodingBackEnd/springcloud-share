@@ -14,6 +14,9 @@ package com.ishanshan.gateway.auth;
 
 public interface AuthConstants {
 
-    /** 网关解析token得到的缓存信息. */
-    String GATEWAY_PARSED_TOKEN_SESSION = "GATEWAY_PARSED_TOKEN_SESSION";
+    /** 空字符串. */
+    String EMPTY = "";
+
+    /** 网关根据token得到的缓存信息，放入request中的属性名. */
+    String GATEWAY_RAW_AUTH_SESSION = "GATEWAY_RAW_AUTH_SESSION";
 }

@@ -22,7 +22,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_ERROR_FILTER_ORDER;
 
 @Component
-public class CustomSendErorFilter extends ZuulFilter {
+public class CustomSendErrorFilter extends ZuulFilter {
 
     private static final Log log = LogFactory.getLog(SendErrorFilter.class);
     protected static final String SEND_ERROR_FILTER_RAN = "sendErrorFilter.ran";

@@ -12,8 +12,12 @@
  ********************************************************************************/
 package com.ishanshan.gateway.filter;
 
-import com.ishanshan.gateway.cache.RedisCache;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ishanshan.gateway.auth.AuthConstants;
+import com.ishanshan.gateway.cache.AuthSession;
 import com.ishanshan.gateway.cache.GatewayRedisKeyUtil;
+import com.ishanshan.gateway.cache.RedisCache;
+import com.ishanshan.gateway.converter.Cache2AuthSessionConverter;
 import com.ishanshan.gateway.exception.GatewayException;
 import com.ishanshan.gateway.exception.GatewayStatus;
 import com.ishanshan.gateway.jwt.JwtAuthConstants;
@@ -25,14 +29,23 @@ import com.ishanshan.gateway.util.UrlUtils;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
-import com.sun.org.apache.xerces.internal.jaxp.JAXPConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.*;
+import javax.servlet.http.*;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.Principal;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Locale;
+import java.util.Map;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_DECORATION_FILTER_ORDER;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
@@ -50,6 +63,8 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 @Component
 @Slf4j
 public class JwtAuthenticationTokenFilter extends ZuulFilter {
+
+    @Autowired private ObjectMapper objectMapper; // Json转化工具
 
     @Autowired private RedisCache redisCache;
 
@@ -69,11 +84,6 @@ public class JwtAuthenticationTokenFilter extends ZuulFilter {
 
     @Override
     public boolean shouldFilter() {
-        RequestContext requestContext = RequestContext.getCurrentContext();
-        HttpServletRequest request = requestContext.getRequest();
-        if (JwtAuthConstants.isAuthSessioin(request)) {
-            return false;
-        }
         return true;
     }
 
@@ -81,12 +91,18 @@ public class JwtAuthenticationTokenFilter extends ZuulFilter {
     public Object run() throws ZuulException {
         RequestContext requestContext = RequestContext.getCurrentContext();
         HttpServletRequest request = requestContext.getRequest();
+
         String gatewayUrl = UrlUtils.buildRequestUrl(request);
         GatewayUrlRegexResult gatewayUrlRegexResult = RegexSupport.matchGatewayUrl(gatewayUrl);
         if (!gatewayUrlRegexResult.isMatched()) {
             requestContext.setSendZuulResponse(false);
             log.error("【网关前置过滤】url不合法，正确格式需满足正则校验， regex={}", RegexDefine.GATEWAY_URL_REGEX);
             throw new GatewayException(GatewayStatus.GATEWAY_PRE_BAD_REQUEST);
+        }
+        requestContext.set(JwtAuthConstants.GATEWAY_URL_REGEX_RESULT, gatewayUrlRegexResult);
+
+        if (JwtAuthConstants.isAuthLogin(request)) {
+            return false;
         }
 
         String authToken = jwtTokenUtil.fetchToken(request);
@@ -106,27 +122,46 @@ public class JwtAuthenticationTokenFilter extends ZuulFilter {
 
         String eurekaServerName = gatewayUrlRegexResult.getEurekaServerName();
         // Redis中是否还存在（比如登出删除/过期丢弃等）
-        String redisKey = GatewayRedisKeyUtil.getUserinfoCacheRedisKey(eurekaServerName, username);
-        boolean existAuthToken = stringRedisTemplate.opsForValue().getOperations().hasKey(redisKey);
+        String userinfoCacheRedisKey =
+                GatewayRedisKeyUtil.getUserinfoCacheRedisKey(eurekaServerName, username);
+        boolean existAuthToken =
+                stringRedisTemplate.opsForValue().getOperations().hasKey(userinfoCacheRedisKey);
         if (!existAuthToken) {
             requestContext.setSendZuulResponse(false);
             log.error("【网关前置过滤】token expired");
             throw new GatewayException(GatewayStatus.GATEWAY_PRE_TOKEN_EXPIRED);
         }
 
-        /*LoginSession loginSession = redisCache.userSession(eurekaServerName, username);
-        CustomUserDetails customUserDetails =
-                new CustomUserDetails(
-                        loginSession.getUserId(),
-                        loginSession.getTenantId(),
-                        loginSession.getCurrentShopId());
-        if (jwtTokenUtil.validateToken(authToken, customUserDetails)) {
-            throw new GatewayException(GatewayStatus.GATEWAY_TOKEN_INVALID);
+        String authSessionJson = stringRedisTemplate.opsForValue().get(userinfoCacheRedisKey);
+        AuthSession authSession = Cache2AuthSessionConverter.convert(authSessionJson);
+        if (!jwtTokenUtil.validateToken(authToken, authSession.getAuthDetail())) {
+            requestContext.setSendZuulResponse(false);
+            log.error(
+                    "【网关前置过滤】token 被篡改, originTokenUsername={}, reqTokenUsername={}",
+                    authSession.getAuthDetail().getUsername(),
+                    username);
+            throw new GatewayException(GatewayStatus.GATEWAY_PRE_TOKEN_FORGED);
         }
 
-        String userCacheJson = loginSession.getPostJson();
-        // TODO: 2019/1/9 如何存入Request
-        log.info("authenticated user " + username + ", setting security context");*/
+        // 白名单校验
+        /*String whitelistRedisKey =
+                GatewayRedisKeyUtil.getUserinfoTokenWhitelistRedisKey(
+                        gatewayUrlRegexResult.getEurekaServerName(), username);
+        String whiteToken = stringRedisTemplate.opsForValue().get(whitelistRedisKey);
+        if (authToken.equals(whiteToken)) {
+            log.error("【网关前置过滤】您已被强制登出,请及时登录修改密码,username={}", username);
+            throw new GatewayException(GatewayStatus.GATEWAY_PRE_USER_FORCED_LOGOUT);
+        }*/
+
+        requestContext.set(JwtAuthConstants.GATEWAY_PARSED_AUTH_SESSION, authSession);
+        request.setAttribute(AuthConstants.GATEWAY_RAW_AUTH_SESSION, authSession.getCachedJson());
+        requestContext.setRequest(
+                new HttpServletRequestWrapper(request) {
+                    @Override
+                    public ServletInputStream getInputStream() throws IOException {
+                        return super.getInputStream();
+                    }
+                });
         return null;
     }
 }

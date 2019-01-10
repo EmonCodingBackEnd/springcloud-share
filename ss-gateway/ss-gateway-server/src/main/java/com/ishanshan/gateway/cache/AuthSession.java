@@ -25,4 +25,6 @@ public class AuthSession implements Serializable {
     private String token;
 
     private AuthDetail authDetail;
+
+    private String cachedJson;
 }

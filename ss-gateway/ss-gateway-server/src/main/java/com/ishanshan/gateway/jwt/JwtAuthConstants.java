@@ -10,9 +10,6 @@ public interface JwtAuthConstants {
 
     String WEBSOCKET_URL_PATTERN = "/websocket/**";
 
-    /** 用户被强制登出. */
-    String ROLE_FORCED_LOGOUT = "ROLE_FORCED_LOGOUT";
-
     /** 系统中使用到的默认编码 */
     Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
@@ -34,15 +31,21 @@ public interface JwtAuthConstants {
     String FOLDER_SEPARATOR = "/";
 
     /** 登录. */
-    String AUTH_LOGIN = "/auth/login";
+    String AUTH_LOGIN = "/*/*/*/auth/login";
 
     /** 用户会话信息. */
-    String AUTH_SESSIOIN = "/auth/session";
+    String AUTH_SESSIOIN = "/*/*/*/auth/session";
 
     /** 登出. */
-    String AUTH_LOGOUT = "/auth/logout";
+    String AUTH_LOGOUT = "/*/*/*/auth/logout";
 
-    AntPathRequestMatcher authLoginRequestMatcher = new AntPathRequestMatcher(AUTH_LOGIN, "POST");
+    /** 存放解析的url结果. */
+    String GATEWAY_URL_REGEX_RESULT = "GATEWAY_URL_REGEX_RESULT";
+
+    /** 解析出来的AuthSession对象. */
+    String GATEWAY_PARSED_AUTH_SESSION = "GATEWAY_PARSED_AUTH_SESSION";
+
+    AntPathRequestMatcher authLoginRequestMatcher = new AntPathRequestMatcher(AUTH_LOGIN);
 
     AntPathRequestMatcher authSessionRequestMatcher =
             new AntPathRequestMatcher(AUTH_SESSIOIN, "POST");
@@ -56,11 +59,11 @@ public interface JwtAuthConstants {
         return authLoginRequestMatcher.matches(request);
     }
 
-    static boolean isAuthSessioin(HttpServletRequest request) {
+    static boolean isAuthSession(HttpServletRequest request) {
         if (request == null) {
             return false;
         }
-        return authLoginRequestMatcher.matches(request);
+        return authSessionRequestMatcher.matches(request);
     }
 
     static boolean isAuthLogout(HttpServletRequest request) {

@@ -17,20 +17,12 @@ import com.ishanshan.gateway.auth.AuthDetail;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.lang.reflect.ParameterizedType;
-
 @EqualsAndHashCode(callSuper = true)
 @Data
-public abstract class GatewayRequest<T extends GatewayResponse> extends AppRequest {
+public abstract class GatewayRequest<T extends GatewayResponse> extends AppRequest<T> {
 
     private static final long serialVersionUID = 6355146217352098846L;
 
     /** 前端请求，经过网关后会被塞入权限信息，在对应服务端解析出结果. */
     private AuthDetail authDetail;
-
-    public Class<T> responseClass() {
-        return (Class<T>)
-                ((ParameterizedType) this.getClass().getGenericSuperclass())
-                        .getActualTypeArguments()[0];
-    }
 }
