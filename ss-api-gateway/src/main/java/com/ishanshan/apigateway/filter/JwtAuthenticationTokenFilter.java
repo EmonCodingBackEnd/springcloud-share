@@ -13,12 +13,10 @@
 package com.ishanshan.apigateway.filter;
 
 import com.ishanshan.apigateway.cache.RedisCache;
-import com.ishanshan.apigateway.cache.RedisKeyUtil;
 import com.ishanshan.apigateway.exception.GatewayException;
 import com.ishanshan.apigateway.exception.GatewayStatus;
-import com.ishanshan.apigateway.filter.auth.CustomUserDetails;
-import com.ishanshan.apigateway.filter.auth.LoginSession;
 import com.ishanshan.apigateway.filter.jwt.JwtTokenUtil;
+import com.ishanshan.apigateway.regex.RegexDefine;
 import com.ishanshan.apigateway.regex.RegexSupport;
 import com.ishanshan.apigateway.regex.result.GatewayUrlRegexResult;
 import com.ishanshan.apigateway.util.UrlUtils;
@@ -78,14 +76,15 @@ public class JwtAuthenticationTokenFilter extends ZuulFilter {
         String gatewayUrl = UrlUtils.buildRequestUrl(request);
         GatewayUrlRegexResult gatewayUrlRegexResult = RegexSupport.matchGatewayUrl(gatewayUrl);
         if (!gatewayUrlRegexResult.isMatched()) {
-            throw new GatewayException(GatewayStatus.GATEWAY_BAD_REQUEST);
+            requestContext.setSendZuulResponse(false);
+            log.error("【网关前置路由】url不合法，正确格式需满足正则校验， regex={}", RegexDefine.GATEWAY_URL_REGEX);
+            throw new GatewayException(GatewayStatus.GATEWAY_PRE_BAD_REQUEST);
         }
 
         String authToken = jwtTokenUtil.fetchToken(request);
         if (StringUtils.isEmpty(authToken)) {
             requestContext.setSendZuulResponse(false);
-            requestContext.setResponseStatusCode(121);
-            throw new GatewayException(GatewayStatus.GATEWAY_TOKEN_NOT_FOUND);
+            throw new GatewayException(GatewayStatus.GATEWAY_PRE_TOKEN_NOT_FOUND);
         }
 
         /*String username = jwtTokenUtil.getUsernameFromToken(authToken);

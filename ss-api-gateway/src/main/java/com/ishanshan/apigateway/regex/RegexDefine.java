@@ -30,11 +30,11 @@ public abstract class RegexDefine {
      * 匹配网关正则.
      *
      * <p>创建时间: <font style="color:#00FFFF">20190109 18:57</font><br>
-     * 匹配示例： /eurekaServerName/serverName/moduleName/operationName
+     * 匹配示例： /eurekaServerName/serverName/apiVersion/others
      *
      * @since 1.0.0
      */
-    public static final String GATEWAY_URL_REGEX = "^/(\\w+)/((?:\\w+)(?:/\\w+)*)$";
+    public static final String GATEWAY_URL_REGEX = "^/(\\w+)(/(\\w+)/(\\w+)(/\\w+)*)$";
 
     /** {@linkplain #GATEWAY_URL_REGEX} */
     public static final Pattern GATEWAY_URL_REGEX_PATTERN = Pattern.compile(GATEWAY_URL_REGEX);

@@ -17,23 +17,22 @@ import lombok.Getter;
 @Getter
 public enum GatewayStatus {
     SUCCESS(0, "成功"),
-    SYSTEM_BUSY(9100, "系统繁忙，请稍后重试"),
 
-    GATEWAY_ERROR(990000, "前置过滤异常"),
+    GATEWAY_ERROR(990000, "网关异常"),
 
-    GATEWAY_PRE_ERROR(990100, "前置过滤异常"),
-    GATEWAY_BAD_REQUEST(990101, "请求地址不合法"),
-    GATEWAY_TOKEN_NOT_FOUND(990102, "token not found!"),
-    GATEWAY_TOKEN_EXPIRED_OR_INVALID(990103, "token expired or invalid"),
-    GATEWAY_TOKEN_EXPIRED(990103, "token expired"),
-    GATEWAY_TOKEN_INVALID(990103, "token invalid"),
+    GATEWAY_PRE_ERROR(990100, "限流控制"),
+    GATEWAY_PRE_REQUEST_COUNT_LIMIT(990101, "系统繁忙，请稍后重试"),
+    GATEWAY_PRE_BAD_REQUEST(990102, "请求地址不合法"),
+    GATEWAY_PRE_TOKEN_NOT_FOUND(990103, "token not found!"),
+    GATEWAY_PRE_TOKEN_EXPIRED_OR_INVALID(990104, "token expired or invalid"),
+    GATEWAY_PRE_TOKEN_EXPIRED(990105, "token expired"),
+    GATEWAY_PRE_TOKEN_INVALID(990106, "token invalid"),
 
-    GATEWAY_ROUTE_ERROR(990100, "路由过滤异常"),
+    GATEWAY_ROUTE_ERROR(990200, "路由过滤异常"),
 
-    GATEWAY_POST_ERROR(990100, "后置过滤异常"),
-    GATEWAY_REQUEST_COUNT_LIMIT(990101, "限流控制"),
+    GATEWAY_POST_ERROR(990300, "后置过滤异常"),
 
-    GATEWAY_ERROR_ERROR(990100, "错误过滤异常"),
+    GATEWAY_ERROR_FILTER_ERROR(990100, "错误过滤异常"),
     ;
 
     private Integer code;

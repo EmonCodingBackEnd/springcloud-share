@@ -14,7 +14,7 @@ package com.ishanshan.apigateway.filter.auth;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.ishanshan.apigateway.api.AppResponse;
+import com.ishanshan.apigateway.api.GatewayResponse;
 import com.ishanshan.apigateway.exception.GatewayStatus;
 import com.ishanshan.apigateway.serializer.Long2StringSerializer;
 import lombok.Data;
@@ -23,7 +23,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AuthResponse extends AppResponse {
+public class AuthResponse extends GatewayResponse {
 
     private static final long serialVersionUID = 6265601817348900418L;
 

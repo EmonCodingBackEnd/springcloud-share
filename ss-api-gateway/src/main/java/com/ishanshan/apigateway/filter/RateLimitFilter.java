@@ -16,7 +16,9 @@ import com.google.common.util.concurrent.RateLimiter;
 import com.ishanshan.apigateway.exception.GatewayException;
 import com.ishanshan.apigateway.exception.GatewayStatus;
 import com.netflix.zuul.ZuulFilter;
+import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
@@ -33,6 +35,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
  * @since 1.0.0
  */
 @Component
+@Slf4j
 public class RateLimitFilter extends ZuulFilter {
 
     // TODO: 2019/1/9 需要可以动态改变限流数量
@@ -55,8 +58,11 @@ public class RateLimitFilter extends ZuulFilter {
 
     @Override
     public Object run() throws ZuulException {
+        RequestContext requestContext = RequestContext.getCurrentContext();
         if (!RATE_LIMITER.tryAcquire()) {
-            throw new GatewayException(GatewayStatus.GATEWAY_REQUEST_COUNT_LIMIT);
+            requestContext.setSendZuulResponse(false);
+            log.error("【网关限流】当前流量超限");
+            throw new GatewayException(GatewayStatus.GATEWAY_PRE_REQUEST_COUNT_LIMIT);
         }
         return null;
     }

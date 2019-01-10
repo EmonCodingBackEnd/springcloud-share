@@ -52,6 +52,10 @@ public class PostFilter extends ZuulFilter {
 
     @Override
     public boolean shouldFilter() {
+        RequestContext requestContext = RequestContext.getCurrentContext();
+        if (!requestContext.sendZuulResponse()) {
+            return false;
+        }
         return true;
     }
 
@@ -63,7 +67,7 @@ public class PostFilter extends ZuulFilter {
         if (JwtAuthConstants.isAuthLogin(request)) {
             // TODO: 2019/1/9 获取Session放入缓存中
         } else {
-            throw new GatewayException(GatewayStatus.GATEWAY_BAD_REQUEST);
+            throw new GatewayException(GatewayStatus.GATEWAY_PRE_BAD_REQUEST);
         }
         response.setHeader("X-Foo", UUID.randomUUID().toString());
         return null;

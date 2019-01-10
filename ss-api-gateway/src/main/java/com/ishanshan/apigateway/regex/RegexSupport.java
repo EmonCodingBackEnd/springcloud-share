@@ -289,6 +289,9 @@ public abstract class RegexSupport {
             result.setUrl(matcher.group(0));
             result.setEurekaServerName(matcher.group(1));
             result.setApi(matcher.group(2));
+            result.setServerName(matcher.group(3));
+            result.setApiVersion(matcher.group(4));
+            result.setOthers(matcher.group(5));
         }
         return result;
     }

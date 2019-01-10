@@ -12,15 +12,21 @@
  ********************************************************************************/
 package com.ishanshan.apigateway.api;
 
+import com.ishansha.api.AppRequest;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public abstract class AppRequest implements Serializable {
+public abstract class GatewayRequest<T extends GatewayResponse> extends AppRequest {
 
-    private static final long serialVersionUID = 6386500729119806662L;
+    private static final long serialVersionUID = 6355146217352098846L;
 
-    /** 请求ID用作幂等性校验 */
-    protected String requestId;
+    public Class<T> responseClass() {
+        return (Class<T>)
+                ((ParameterizedType) this.getClass().getGenericSuperclass())
+                        .getActualTypeArguments()[0];
+    }
 }

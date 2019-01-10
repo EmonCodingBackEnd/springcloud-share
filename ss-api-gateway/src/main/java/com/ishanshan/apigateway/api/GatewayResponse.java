@@ -12,22 +12,17 @@
  ********************************************************************************/
 package com.ishanshan.apigateway.api;
 
+import com.ishansha.api.AppResponse;
 import com.ishanshan.apigateway.exception.GatewayStatus;
-import lombok.Data;
 
 import java.io.Serializable;
 
-@Data
-public class AppResponse<T extends Serializable> implements Serializable {
+public class GatewayResponse<T extends Serializable> extends AppResponse {
 
-    private static final long serialVersionUID = -3455461468232581561L;
+    private static final long serialVersionUID = 5005298608206740834L;
 
     /** 错误码. */
     protected Integer errorCode = GatewayStatus.SUCCESS.getCode();
 
-    /** 提示信息. */
-    protected String errorMessage = GatewayStatus.SUCCESS.getMessage();
-
-    /** 具体内容. */
-    private T data;
+    protected T data;
 }
