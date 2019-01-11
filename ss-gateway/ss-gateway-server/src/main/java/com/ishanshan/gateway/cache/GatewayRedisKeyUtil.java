@@ -19,7 +19,7 @@ public class GatewayRedisKeyUtil {
         return GatewayRedisKeyType.USERINFO_TOKEN.getKey().concat(username);
     }
 
-    /** 用户authToken白名单列表 */
+    /** 用户jwtToken白名单列表 */
     public static String getUserinfoTokenWhitelistRedisKey(String eurekaServerName, String userId) {
         return eurekaServerName
                 .concat(GatewayRedisKeyType.USERINFO_TOKENWHITELIST.getKey())

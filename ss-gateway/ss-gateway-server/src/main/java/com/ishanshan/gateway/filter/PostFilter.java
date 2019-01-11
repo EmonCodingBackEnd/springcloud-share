@@ -35,7 +35,6 @@ import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
@@ -95,16 +94,21 @@ public class PostFilter extends ZuulFilter {
         }
 
         AuthResponse authResponse = ResponseBody2AuthResponseConverter.convert(responseBody);
-        if (!GatewayStatus.SUCCESS.getCode().equals(authResponse.getErrorCode())) {
-            log.error("【网关后置过滤】用户登录失败 responseBody=", responseBody);
+        /*if (!GatewayStatus.SUCCESS.getCode().equals(authResponse.getErrorCode())) {
+            log.error("【网关后置过滤】接口处理失败 responseBody={}", responseBody);
             throw new GatewayException(authResponse.getErrorCode(), authResponse.getErrorMessage());
-        }
+        }*/
 
         if (JwtAuthConstants.isAuthLogin(request)) {
-            String authToken = jwtTokenUtil.generateToken(authResponse.getAuthDetail());
+            if (StringUtils.isEmpty(authResponse.getAuthDetail())
+                    || StringUtils.isEmpty(authResponse.getAuthDetail().getUserId())) {
+                log.error("【网关后置过滤】用户登录,用户标识信息不存在, authDetail={}", authResponse.getAuthDetail());
+                throw new GatewayException(GatewayStatus.GATEWAY_POST_MISS_AUTH_DETAIL_ERROR);
+            }
+            String jwtToken = jwtTokenUtil.generateToken(authResponse.getAuthDetail());
             try {
                 TokenResponse tokenResponse = new TokenResponse();
-                tokenResponse.setToken(authToken);
+                tokenResponse.setJwtToken(jwtToken);
                 String newResponseBody = objectMapper.writeValueAsString(tokenResponse);
                 requestContext.setResponseBody(newResponseBody);
             } catch (JsonProcessingException e) {
@@ -112,7 +116,7 @@ public class PostFilter extends ZuulFilter {
                 throw new GatewayException(GatewayStatus.GATEWAY_POST_GENERATE_TOKEN_ERROR);
             }
             AuthSession authSession = new AuthSession();
-            authSession.setJwtToken(authToken);
+            authSession.setJwtToken(jwtToken);
             authSession.setAuthDetail(authResponse.getAuthDetail());
             authSession.setCachedJson(responseBody);
 
@@ -125,7 +129,7 @@ public class PostFilter extends ZuulFilter {
             String eurekaServerName = gatewayUrlRegexResult.getEurekaServerName();
             String userinfoCacheRedisKey =
                     GatewayRedisKeyUtil.getUserinfoCacheRedisKey(
-                            eurekaServerName, authSession.getAuthDetail().getUsername());
+                            eurekaServerName, authSession.getAuthDetail().getUserId());
             stringRedisTemplate
                     .opsForValue()
                     .set(
@@ -137,14 +141,16 @@ public class PostFilter extends ZuulFilter {
             String whitelistRedisKey =
                     GatewayRedisKeyUtil.getUserinfoTokenWhitelistRedisKey(
                             gatewayUrlRegexResult.getEurekaServerName(),
-                            authResponse.getAuthDetail().getUsername());
+                            authResponse.getAuthDetail().getUserId());
             stringRedisTemplate
                     .opsForValue()
-                    .set(whitelistRedisKey, authToken, JwtTokenUtil.expiration, TimeUnit.SECONDS);
+                    .set(whitelistRedisKey, jwtToken, JwtTokenUtil.expiration, TimeUnit.SECONDS);
         } else if (JwtAuthConstants.isAuthSession(request)) {
             AuthSession authSession =
                     (AuthSession) requestContext.get(JwtAuthConstants.GATEWAY_PARSED_AUTH_SESSION);
+            String userId = authSession.getAuthDetail().getUserId();
             authSession.setAuthDetail(authResponse.getAuthDetail());
+            authSession.getAuthDetail().setUserId(userId);
             authSession.setCachedJson(responseBody);
 
             String authSessionJson = null;
@@ -157,7 +163,7 @@ public class PostFilter extends ZuulFilter {
             String eurekaServerName = gatewayUrlRegexResult.getEurekaServerName();
             String userinfoCacheRedisKey =
                     GatewayRedisKeyUtil.getUserinfoCacheRedisKey(
-                            eurekaServerName, authSession.getAuthDetail().getUsername());
+                            eurekaServerName, authSession.getAuthDetail().getUserId());
             stringRedisTemplate
                     .opsForValue()
                     .set(
@@ -168,7 +174,7 @@ public class PostFilter extends ZuulFilter {
 
             String whitelistRedisKey =
                     GatewayRedisKeyUtil.getUserinfoTokenWhitelistRedisKey(
-                            eurekaServerName, authSession.getAuthDetail().getUsername());
+                            eurekaServerName, authSession.getAuthDetail().getUserId());
             stringRedisTemplate
                     .opsForValue()
                     .set(
@@ -178,9 +184,8 @@ public class PostFilter extends ZuulFilter {
                             TimeUnit.SECONDS);
 
         } else {
-            throw new GatewayException(GatewayStatus.GATEWAY_POST_PARSE_RESPONSE_BODY_ERROR);
+            // 什么都不需要了
         }
-        response.setHeader("X-Foo", UUID.randomUUID().toString());
         return null;
     }
 }

@@ -16,8 +16,6 @@ import com.ishanshan.gateway.exception.GatewayException;
 import com.ishanshan.gateway.filter.FilterResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,6 +31,6 @@ public class ErrorHandler {
         FilterResponse authResponse = new FilterResponse();
         authResponse.setErrorCode(gatewayException.getCode());
         authResponse.setErrorMessage(gatewayException.getMessage());
-        return new ResponseEntity<>(authResponse, HttpStatus.BAD_GATEWAY);
+        return new ResponseEntity<>(authResponse, HttpStatus.OK);
     }
 }

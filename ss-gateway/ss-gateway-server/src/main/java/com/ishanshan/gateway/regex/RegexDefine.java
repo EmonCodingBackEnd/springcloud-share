@@ -34,7 +34,8 @@ public abstract class RegexDefine {
      *
      * @since 1.0.0
      */
-    public static final String GATEWAY_URL_REGEX = "^/(\\w+)(/(\\w+)(/\\w+)*)$";
+    public static final String GATEWAY_URL_REGEX =
+            "^/([A-Za-z0-9-]+)(/([A-Za-z0-9-]+)(/[A-Za-z0-9-]+)*)$";
     //            "^/(\\w+)(/(\\w+)/([vV]\\d\\.\\d+(?:\\.\\d+)*)(/\\w+)*)$";
 
     /** {@linkplain #GATEWAY_URL_REGEX} */

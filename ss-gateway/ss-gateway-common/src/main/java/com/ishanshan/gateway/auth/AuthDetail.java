@@ -24,22 +24,22 @@ public class AuthDetail implements Serializable {
     private static final long serialVersionUID = -25873329848935908L;
 
     /** 注意：这里是用户的唯一标识，一般来讲是用户的ID. */
-    protected String username;
+    protected String userId;
 
     /** 用户的权限列表. */
     protected Set<GrantedAuthority> authorities;
 
     public AuthDetail() {
-        this.username = AuthConstants.EMPTY;
+        this.userId = AuthConstants.EMPTY;
         this.authorities = new HashSet<>();
     }
 
-    public AuthDetail(String username, Collection<? extends GrantedAuthority> authorities) {
-        if (((username == null) || "".equals(username))) {
+    public AuthDetail(String userId, Collection<? extends GrantedAuthority> authorities) {
+        if (((userId == null) || "".equals(userId))) {
             throw new IllegalArgumentException("Cannot pass null or empty values to constructor");
         }
 
-        this.username = username;
+        this.userId = userId;
         this.authorities = Collections.unmodifiableSet(sortAuthorities(authorities));
     }
 
@@ -88,21 +88,21 @@ public class AuthDetail implements Serializable {
     @Override
     public boolean equals(Object rhs) {
         if (rhs instanceof AuthDetail) {
-            return username.equals(((AuthDetail) rhs).username);
+            return userId.equals(((AuthDetail) rhs).userId);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return username.hashCode();
+        return userId.hashCode();
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(super.toString()).append(": ");
-        sb.append("Username: ").append(this.username).append("; ");
+        sb.append("userId: ").append(this.userId).append("; ");
 
         if (!authorities.isEmpty()) {
             sb.append("Granted Authorities: ");

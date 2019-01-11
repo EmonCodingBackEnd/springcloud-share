@@ -1,5 +1,17 @@
 env: dev
-eureka:
-  client:
-    service-url:
-      defaultZone: http://${prod.host}:8761/eureka/
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://${prod.host}:8761/eureka/
+#eureka:
+#  instance:
+#    metadataMap:
+#      tag: offline
+#  client:
+#    healthcheck:
+#      enabled: true
+#    serviceUrl:
+#      defaultZone: http://192.168.1.56:1111/eureka/
+#      loadbalancer:
+#        retry:
+#          enabled: false

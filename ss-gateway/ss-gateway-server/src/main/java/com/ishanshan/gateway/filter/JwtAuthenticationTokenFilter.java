@@ -92,7 +92,10 @@ public class JwtAuthenticationTokenFilter extends ZuulFilter {
         String gatewayUrl = UrlUtils.buildRequestUrl(request);
         GatewayUrlRegexResult gatewayUrlRegexResult = RegexSupport.matchGatewayUrl(gatewayUrl);
         if (!gatewayUrlRegexResult.isMatched()) {
-            log.error("【网关前置过滤】url不合法，正确格式需满足正则校验， regex={}", RegexDefine.GATEWAY_URL_REGEX);
+            log.error(
+                    "【网关前置过滤】url不合法，正确格式需满足正则校验， url={}, regex={}",
+                    gatewayUrl,
+                    RegexDefine.GATEWAY_URL_REGEX);
             throw new GatewayException(GatewayStatus.GATEWAY_PRE_BAD_REQUEST);
         }
         requestContext.set(JwtAuthConstants.GATEWAY_URL_REGEX_RESULT, gatewayUrlRegexResult);
@@ -101,7 +104,8 @@ public class JwtAuthenticationTokenFilter extends ZuulFilter {
             String httpMethod = request.getMethod();
             String contentType = request.getContentType();
             log.error(
-                    "【网关前置过滤】仅支持POST JSON形式的请求, httpMethod={}, contentType={}",
+                    "【网关前置过滤】仅支持POST JSON形式的请求, url={}, httpMethod={}, contentType={}",
+                    gatewayUrl,
                     httpMethod,
                     contentType);
             throw new GatewayException(GatewayStatus.GATEWAY_PRE_ONLY_POST_JSON_SUPPORT);
@@ -111,15 +115,15 @@ public class JwtAuthenticationTokenFilter extends ZuulFilter {
             return false;
         }
 
-        String authToken = jwtTokenUtil.fetchToken(request);
-        if (StringUtils.isEmpty(authToken)) {
+        String jwtToken = jwtTokenUtil.fetchToken(request);
+        if (StringUtils.isEmpty(jwtToken)) {
             log.error("【网关前置过滤】jwtToken not found");
             throw new GatewayException(GatewayStatus.GATEWAY_PRE_TOKEN_NOT_FOUND);
         }
 
-        String username = jwtTokenUtil.getUsernameFromToken(authToken);
+        String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
         if (StringUtils.isEmpty(username)) {
-            log.error("【网关前置过滤】jwtToken invalid， jwtToken={}", authToken);
+            log.error("【网关前置过滤】jwtToken invalid， jwtToken={}", jwtToken);
             throw new GatewayException(GatewayStatus.GATEWAY_PRE_TOKEN_INVALID);
         }
         log.info("checking authentication " + username);
@@ -128,19 +132,19 @@ public class JwtAuthenticationTokenFilter extends ZuulFilter {
         // Redis中是否还存在（比如登出删除/过期丢弃等）
         String userinfoCacheRedisKey =
                 GatewayRedisKeyUtil.getUserinfoCacheRedisKey(eurekaServerName, username);
-        boolean existAuthToken =
+        boolean existJwtToken =
                 stringRedisTemplate.opsForValue().getOperations().hasKey(userinfoCacheRedisKey);
-        if (!existAuthToken) {
+        if (!existJwtToken) {
             log.error("【网关前置过滤】jwtToken expired");
             throw new GatewayException(GatewayStatus.GATEWAY_PRE_TOKEN_EXPIRED);
         }
 
         String authSessionJson = stringRedisTemplate.opsForValue().get(userinfoCacheRedisKey);
         AuthSession authSession = Cache2AuthSessionConverter.convert(authSessionJson);
-        if (!jwtTokenUtil.validateToken(authToken, authSession.getAuthDetail())) {
+        if (!jwtTokenUtil.validateToken(jwtToken, authSession.getAuthDetail())) {
             log.error(
                     "【网关前置过滤】jwtToken 被篡改, originTokenUsername={}, reqTokenUsername={}",
-                    authSession.getAuthDetail().getUsername(),
+                    authSession.getAuthDetail().getUserId(),
                     username);
             throw new GatewayException(GatewayStatus.GATEWAY_PRE_TOKEN_FORGED);
         }
@@ -148,10 +152,10 @@ public class JwtAuthenticationTokenFilter extends ZuulFilter {
         // 白名单校验
         /*String whitelistRedisKey =
                 GatewayRedisKeyUtil.getUserinfoTokenWhitelistRedisKey(
-                        gatewayUrlRegexResult.getEurekaServerName(), username);
+                        gatewayUrlRegexResult.getEurekaServerName(), userId);
         String whiteToken = stringRedisTemplate.opsForValue().get(whitelistRedisKey);
-        if (authToken.equals(whiteToken)) {
-            log.error("【网关前置过滤】您已被强制登出,请及时登录修改密码,username={}", username);
+        if (jwtToken.equals(whiteToken)) {
+            log.error("【网关前置过滤】您已被强制登出,请及时登录修改密码,userId={}", userId);
             throw new GatewayException(GatewayStatus.GATEWAY_PRE_USER_FORCED_LOGOUT);
         }*/
 
@@ -175,16 +179,17 @@ public class JwtAuthenticationTokenFilter extends ZuulFilter {
                     StreamUtils.copyToString(
                             in, Charset.forName(JwtAuthConstants.DEFAULT_CHARSET.name()));
             log.info(
-                    "【网关前置过滤】更新请求信息失败,方法执行前: url={}, requestBody={}",
+                    "【网关前置过滤】合并参数,方法执行前: url={}, requestBody={}",
                     gatewayUrlRegexResult.getUrl(),
                     requestBody);
             JSONObject reqJson = JSONObject.fromObject(requestBody);
             JSONObject authJson = JSONObject.fromObject(authSession.getCachedJson());
+            authJson = JSONObject.fromObject(authJson.get("authDetail"));
 
             for (Object authKey : authJson.keySet()) {
                 if (reqJson.containsKey(authKey)) {
                     log.warn(
-                            "【网关前置过滤】更新请求信息失败时发生覆盖， url={}, key={}",
+                            "【网关前置过滤】合并参数时发生覆盖， url={}, key={}",
                             gatewayUrlRegexResult.getUrl(),
                             authKey);
                     reqJson.put(authKey, authJson.get(authKey));
@@ -194,7 +199,7 @@ public class JwtAuthenticationTokenFilter extends ZuulFilter {
             }
             String newRequestBody = reqJson.toString();
             log.info(
-                    "【网关前置过滤】更新请求信息,方法执行后: url={}, newRequestBody={}",
+                    "【网关前置过滤】合并参数,方法执行后: url={}, newRequestBody={}",
                     gatewayUrlRegexResult.getUrl(),
                     newRequestBody);
             final byte[] reqBodyBytes = newRequestBody.getBytes();

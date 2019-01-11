@@ -87,7 +87,8 @@ public interface JwtAuthConstants {
             return false;
         }
         String contentType = request.getContentType();
-        if (!ContentType.APPLICATION_JSON_VALUE.equals(contentType)) {
+        if (!ContentType.APPLICATION_JSON_VALUE.equals(contentType)
+                && !ContentType.APPLICATION_JSON_UTF8_VALUE.equals(contentType)) {
             return false;
         }
         return true;

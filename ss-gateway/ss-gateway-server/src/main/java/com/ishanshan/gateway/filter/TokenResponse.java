@@ -24,5 +24,5 @@ public class TokenResponse extends GatewayResponse {
 
     private static final long serialVersionUID = 8699939359290158519L;
 
-    private String token;
+    private String jwtToken;
 }

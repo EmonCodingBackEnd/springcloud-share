@@ -19,7 +19,7 @@ import java.util.List;
 
 public enum GatewayRedisKeyType {
     USERINFO_TOKEN("user", "token", "用户登录标识缓存"),
-    USERINFO_TOKENWHITELIST("user", "tokenWhitelist", "用户authToken白名单列表"),
+    USERINFO_TOKENWHITELIST("user", "tokenWhitelist", "用户jwtToken白名单列表"),
     USERINFO_SESSION("user", "cache", "用户登录缓存信息"),
     ;
 

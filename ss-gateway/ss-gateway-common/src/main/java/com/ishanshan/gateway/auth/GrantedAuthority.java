@@ -12,8 +12,43 @@
  ********************************************************************************/
 package com.ishanshan.gateway.auth;
 
+import lombok.Data;
+import org.springframework.util.Assert;
+
 import java.io.Serializable;
 
-public interface GrantedAuthority extends Serializable {
-    String getAuthority();
+@Data
+public class GrantedAuthority implements Serializable {
+    private static final long serialVersionUID = -6213739599007493368L;
+
+    private final String url;
+
+    public GrantedAuthority(String url) {
+        Assert.hasText(url, "A granted authority textual representation is required");
+        this.url = url;
+    }
+
+    public String getAuthority() {
+        return url;
+    }
+
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj instanceof GrantedAuthority) {
+            return url.equals(((GrantedAuthority) obj).url);
+        }
+
+        return false;
+    }
+
+    public int hashCode() {
+        return this.url.hashCode();
+    }
+
+    public String toString() {
+        return this.url;
+    }
 }

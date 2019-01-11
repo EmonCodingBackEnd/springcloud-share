@@ -5,23 +5,23 @@ server:
   port: 8789
 
 # 访问config需要的配置
-eureka:
-  client:
-    service-url:
-      defaultZone: http://192.168.1.56:1111/eureka/
-
 #eureka:
-#  instance:
-#    metadataMap:
-#      tag: offline
 #  client:
-#    healthcheck:
-#      enabled: true
-#    serviceUrl:
-#      defaultZone: http://192.168.1.56:1111/eureka/
-#      loadbalancer:
-#        retry:
-#          enabled: false
+#    service-url:
+#      defaultZone: http://${prod.host}:8761/eureka/
+
+eureka:
+  instance:
+    metadataMap:
+      tag: offline
+  client:
+    healthcheck:
+      enabled: true
+    serviceUrl:
+      defaultZone: http://192.168.1.56:1111/eureka/
+      loadbalancer:
+        retry:
+          enabled: false
 
 spring:
   application:
@@ -35,7 +35,7 @@ spring:
 #        service-id: config
 #      profile: dev
 #      label: master
-#      username: user
+#      userId: user
 #      password: 123456
 
 

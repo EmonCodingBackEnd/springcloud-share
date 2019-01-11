@@ -145,7 +145,7 @@ public class JwtTokenUtil implements Serializable {
 
     public String generateToken(AuthDetail authDetail) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put(CLAIM_KEY_USERNAME, authDetail.getUsername());
+        claims.put(CLAIM_KEY_USERNAME, authDetail.getUserId());
         claims.put(CLAIM_KEY_CREATED, new Date());
         return generateToken(claims);
     }
@@ -179,7 +179,7 @@ public class JwtTokenUtil implements Serializable {
     public Boolean validateToken(String token, AuthDetail authDetail) {
         final String username = getUsernameFromToken(token);
         final Date created = getCreatedDateFromToken(token);
-        return (username.equals(authDetail.getUsername()) && !isTokenExpired(token));
+        return (username.equals(authDetail.getUserId()) && !isTokenExpired(token));
     }
     /**
      * 根据HttpServletRequest获取token.
@@ -193,7 +193,7 @@ public class JwtTokenUtil implements Serializable {
      * @since 1.0.0
      */
     public String fetchToken(HttpServletRequest request) {
-        String authToken = null;
+        String jwtToken = null;
         String authHeader;
         if (webSocketRequestMatcher.matches(request)) {
             authHeader = request.getParameter(JwtTokenUtil.TOKEN_HEADER);
@@ -202,18 +202,18 @@ public class JwtTokenUtil implements Serializable {
                     authHeader = URLDecoder.decode(authHeader, StandardCharsets.UTF_8.name());
                 } catch (UnsupportedEncodingException e) {
                     authHeader = null;
-                    log.error("【JwtTokenUtil】解析authToken失败", e);
+                    log.error("【JwtTokenUtil】解析jwtToken失败", e);
                 }
             }
         } else {
             authHeader = request.getHeader(JwtTokenUtil.TOKEN_HEADER);
         }
         if (authHeader != null && authHeader.startsWith(JwtTokenUtil.TOKEN_PREFIX)) {
-            authToken =
+            jwtToken =
                     authHeader.substring(
                             JwtTokenUtil.TOKEN_PREFIX.length()); // The part after "Bearer "
         }
-        return authToken;
+        return jwtToken;
     }
 
     // 公钥加密
