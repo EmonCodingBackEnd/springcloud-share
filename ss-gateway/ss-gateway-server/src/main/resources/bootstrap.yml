@@ -8,21 +8,34 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://${prod.host}:8761/eureka/
+      defaultZone: http://192.168.1.56:1111/eureka/
+
+#eureka:
+#  instance:
+#    metadataMap:
+#      tag: offline
+#  client:
+#    healthcheck:
+#      enabled: true
+#    serviceUrl:
+#      defaultZone: http://192.168.1.56:1111/eureka/
+#      loadbalancer:
+#        retry:
+#          enabled: false
 
 spring:
   application:
-    name: ss-api-gateway
+    name: ss-gateway-server
   profiles:
     active: dev
-  cloud:
-    config:
-      discovery:
-        enabled: true
-        service-id: config
-      profile: dev
-      label: master
-      username: user
-      password: 123456
+#  cloud:
+#    config:
+#      discovery:
+#        enabled: true
+#        service-id: config
+#      profile: dev
+#      label: master
+#      username: user
+#      password: 123456
 
 

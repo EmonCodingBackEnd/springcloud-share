@@ -290,8 +290,9 @@ public abstract class RegexSupport {
             result.setEurekaServerName(matcher.group(1));
             result.setApi(matcher.group(2));
             result.setServerName(matcher.group(3));
-            result.setApiVersion(matcher.group(4));
-            result.setEffectiveUrl(matcher.group(5));
+            /*result.setApiVersion(matcher.group(4));
+            result.setEffectiveUrl(matcher.group(5));*/
+            result.setEffectiveUrl(matcher.group(4));
         }
         return result;
     }

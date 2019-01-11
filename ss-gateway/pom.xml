@@ -101,6 +101,19 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
+    <!-- 向私服中发布jar时配置 -->
+    <distributionManagement>
+        <repository>
+            <id>releases</id><!-- ID必须和setting.xml文件中一致 -->
+            <name>Nexus Release Repository</name>
+            <url>https://repo.ishanshan.com/repository/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id><!-- ID必须和setting.xml文件中一致 -->
+            <name>Nexus Snapshot Repository</name>
+            <url>https://repo.ishanshan.com/repository/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <build>
         <plugins>

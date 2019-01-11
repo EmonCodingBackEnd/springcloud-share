@@ -23,11 +23,13 @@ public enum GatewayStatus {
     GATEWAY_PRE_ERROR(990100, "限流控制"),
     GATEWAY_PRE_REQUEST_COUNT_LIMIT(990101, "系统繁忙，请稍后重试"),
     GATEWAY_PRE_BAD_REQUEST(990102, "请求地址不合法"),
-    GATEWAY_PRE_TOKEN_NOT_FOUND(990103, "token not found!"),
-    GATEWAY_PRE_TOKEN_INVALID(990104, "token invalid"),
-    GATEWAY_PRE_TOKEN_EXPIRED(990105, "token expired"),
-    GATEWAY_PRE_TOKEN_FORGED(990106, "token 被篡改"),
-    GATEWAY_PRE_USER_FORCED_LOGOUT(990106, "您已被强制登出,请及时登录修改密码"),
+    GATEWAY_PRE_ONLY_POST_JSON_SUPPORT(990103, "仅支持POST JSON形式的请求"),
+    GATEWAY_PRE_TOKEN_NOT_FOUND(990104, "jwtToken not found!"),
+    GATEWAY_PRE_TOKEN_INVALID(990105, "jwtToken invalid"),
+    GATEWAY_PRE_TOKEN_EXPIRED(990106, "jwtToken expired"),
+    GATEWAY_PRE_TOKEN_FORGED(990107, "jwtToken 被篡改"),
+    GATEWAY_PRE_USER_FORCED_LOGOUT(990108, "您已被强制登出,请及时登录修改密码"),
+    GATEWAY_PRE_COMBINE_REQUEST_BODY_ERROR(990108, "更新请求信息失败"),
 
     GATEWAY_ROUTE_ERROR(990200, "路由过滤异常"),
 

@@ -22,7 +22,7 @@ public class AuthSession implements Serializable {
 
     private static final long serialVersionUID = 6533255490745378123L;
 
-    private String token;
+    private String jwtToken;
 
     private AuthDetail authDetail;
 

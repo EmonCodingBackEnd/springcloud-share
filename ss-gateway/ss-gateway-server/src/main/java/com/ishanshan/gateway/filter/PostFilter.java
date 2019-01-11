@@ -112,7 +112,7 @@ public class PostFilter extends ZuulFilter {
                 throw new GatewayException(GatewayStatus.GATEWAY_POST_GENERATE_TOKEN_ERROR);
             }
             AuthSession authSession = new AuthSession();
-            authSession.setToken(authToken);
+            authSession.setJwtToken(authToken);
             authSession.setAuthDetail(authResponse.getAuthDetail());
             authSession.setCachedJson(responseBody);
 
@@ -173,7 +173,7 @@ public class PostFilter extends ZuulFilter {
                     .opsForValue()
                     .set(
                             whitelistRedisKey,
-                            authSession.getToken(),
+                            authSession.getJwtToken(),
                             JwtTokenUtil.expiration,
                             TimeUnit.SECONDS);
 

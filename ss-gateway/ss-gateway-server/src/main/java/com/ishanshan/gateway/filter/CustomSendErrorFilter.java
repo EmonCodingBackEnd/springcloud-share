@@ -27,7 +27,7 @@ public class CustomSendErrorFilter extends ZuulFilter {
     private static final Log log = LogFactory.getLog(SendErrorFilter.class);
     protected static final String SEND_ERROR_FILTER_RAN = "sendErrorFilter.ran";
 
-    @Value("${error.path:/error}")
+    @Value("${error.path:/gateway/error}")
     private String errorPath;
 
     @Override
@@ -43,6 +43,10 @@ public class CustomSendErrorFilter extends ZuulFilter {
     @Override
     public boolean shouldFilter() {
         RequestContext ctx = RequestContext.getCurrentContext();
+
+        // 如果报错，不发送服务
+        ctx.setSendZuulResponse(false);
+
         // only forward to errorPath if it hasn't been forwarded to already
         return ctx.getThrowable() != null && !ctx.getBoolean(SEND_ERROR_FILTER_RAN, false);
     }
