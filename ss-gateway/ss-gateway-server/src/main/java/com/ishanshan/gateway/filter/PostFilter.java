@@ -146,6 +146,10 @@ public class PostFilter extends ZuulFilter {
                     .opsForValue()
                     .set(whitelistRedisKey, jwtToken, JwtTokenUtil.expiration, TimeUnit.SECONDS);
         } else if (JwtAuthConstants.isAuthSession(request)) {
+            if (StringUtils.isEmpty(authResponse.getAuthDetail())) {
+                log.error("【网关后置过滤】用户登录Session未应答, authDetail={}", authResponse.getAuthDetail());
+                throw new GatewayException(GatewayStatus.GATEWAY_POST_MISS_AUTH_DETAIL_ERROR);
+            }
             AuthSession authSession =
                     (AuthSession) requestContext.get(JwtAuthConstants.GATEWAY_PARSED_AUTH_SESSION);
             String userId = authSession.getAuthDetail().getUserId();

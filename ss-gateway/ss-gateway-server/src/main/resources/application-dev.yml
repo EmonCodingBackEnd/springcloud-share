@@ -1,17 +1,21 @@
 env: dev
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: http://${prod.host}:8761/eureka/
-#eureka:
-#  instance:
-#    metadataMap:
-#      tag: offline
-#  client:
-#    healthcheck:
-#      enabled: true
-#    serviceUrl:
-#      defaultZone: http://192.168.1.56:1111/eureka/
-#      loadbalancer:
-#        retry:
-#          enabled: false
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${prod.host}:8761/eureka/
+
+spring:
+  cache:
+    type: redis
+    cache-names: redisCache
+  redis:
+    database: 0
+    host: ${prod.host}
+    port: 6379
+    timeout: 0
+    password: redis@163
+
+zuul:
+  host:
+    connect-timeout-millis: 10000
+#  servlet-path: /api
