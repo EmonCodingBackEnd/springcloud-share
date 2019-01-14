@@ -62,6 +62,12 @@
                 <artifactId>ss-gateway-common</artifactId>
                 <version>${ss-gateway.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.ishanshan</groupId>
+                <artifactId>ss-gray-plugin</artifactId>
+                <version>1.0.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

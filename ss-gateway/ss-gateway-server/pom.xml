@@ -60,6 +60,11 @@
             <version>1.2.32</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.ishanshan</groupId>
+            <artifactId>ss-gray-plugin</artifactId>
+        </dependency>
+
 
         <!--早期的json转换工具，已弃用-->
         <dependency>
